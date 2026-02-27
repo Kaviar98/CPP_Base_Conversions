@@ -1,166 +1,112 @@
 //Function Definition
-//ECE2514 E.Chen
-#include <string>
-#include <vector>
+//ECE 2514 E.Chen
 using namespace std;
+#include <string>
+#include <iostream>
 
-//count unique integers
-int count_unique(const vector<int>& nums)
+
+//helper function to convert string inputs into integers
+int char_int (string input)
 {
-    bool isUnique = false;
-    vector<int> uniqueNums;//do not use a string to store integers, use a vector! strings store characters
-    
-    if (nums.empty())
+    int value = 0;
+    for (size_t i = 0; i < input.size(); i++)
     {
-        return 0; //return 0, for no unique inputs
-    }
-
-    for (int i = 0; i < nums.size(); i++)
-    {
-        bool isUnique = true;
-
-        for (int j = 0; j < uniqueNums.size(); j++)
-        {
-            if (nums[i] == uniqueNums[j])
+        int digit = input[i] - '0';                  //turn the character into an integer
+            if (digit < 0 || digit > 9)
             {
-                isUnique = false;
-                break; //break exits the inner loop ONLY, not outer or function
+                return -1;
             }
-            // if (nums[i] != uniqueNums[j])                       //this is logically incorrect and redundant, if the last int nums[i]  = 7 and uniqueNums = 9, but there was 7 earlier, it overwrites the correct result
-            // {
-            //     isUnique = true;
-            // }
-        }
-        if (isUnique)
-        {
-            uniqueNums.push_back(nums[i]);
-        }
+        value = value * 10 + digit;
     }
-    return static_cast<int>(uniqueNums.size());
+    return value;
 }
 
-
-//remove occurences
-//vector.erase(iterator start, iterator end)
-void remove_value(vector<int>& nums, int target)
+//Converting decimal to binary
+string dec_bin (string input)
 {
-    vector<int> result;
+    int value = char_int(input);
+    string ans;
+
+    if (value == 0)
+    {
+        return "0";
+    }
+
+    while (value > 0)                       //continue executing as long as there is a value
+    {
+        int remainder = value % 2;          //find the remainders
     
-    for (int i = 0; i < nums.size(); i ++)
-    {
-        if (nums[i] != target)
+        if (remainder == 1)
         {
-            result.push_back(nums[i]);
+            ans = '1' + ans;                //builds the string from the most sig bit to least by apending the previous answer to the end
         }
+        if (remainder == 0)
+        {
+            ans = '0' + ans;
+        }
+        value = value / 2;
     }
-    nums = result;
+    return ans;
 }
 
-//odd occurence finder
-int odd_occurence(const vector<int>& nums)
+int toPower (int base, int expo)
 {
-    for (size_t i = 1; i < nums.size(); i++)
-    {
-        int count = 0;
-        for (size_t j = 1; j < nums.size(); j++)
+    int answer = 1;
+    for (int i = 0; i < expo; i++)
         {
-            if (nums[i] == nums[j])
-            {
-                count ++;
-            }
+            answer = answer * base;
         }
-        if (count % 2 != 0)
-       { 
-            return nums[i];
-       }
-    }
-    return -1;
+    return answer;
 }
 
-
-//remove all vowels
-string remove_vowels(const string& s)
+//Converting binary to decimal
+int bin_dec (string input)
 {
-    string copy = s;
-    string vowels = "aeiouAEIOU";
-    
-    for (int i = 0; i < copy.size(); )
-    {
-        if (vowels.find(copy[i]) != string::npos)
-        {
-            copy.erase(i ,1);
-        }
-        else
-        {
-            i++; //only advace when keeping the characters
-        }
-    }
-    return copy;
-}
-
-//compress repeated characters
-//start at index 0
-//count how many times s[i] appears consecutively
-//append s[i] and the number
-//jump forward by that count
-//continue until the end
-string compress (const string& s)
-{
-    if (s.empty())
+    if (input.empty())
     {
         return 0;
     }
 
-    int count = 1;
-    string answer;
-    for (int i = 0; i < s.size(); i++)
+    int answer = 0;
+    int expo = 0;
+
+    for (size_t i = input.size(); i-- > 0;)  //read from right to left, read from least significant to most significant
     {
-        if (i + 1 <s.size() && s[i] == s[i + 1])          //if the next character is the same, increase the count
+        if (input[i] == '1')
         {
-            count ++;
+            int term = toPower(2, expo);
+            answer = answer + term;
         }
-        else
+        else if (input[i] != '0')
         {
-            answer += s[i];                                 //end of a run --> apend character + count
-            answer += to_string(count);                     //converts the integer to a characer, appends to the answer string
-            count = 1;                                      //must reset for the next run
+            return -1;                      //invalid character
         }
+        expo ++;                            //power needs to be outside the loop, to ensure that even if the digit is '0', it increments
     }
     return answer;
 }
 
-//convert string to 2D vector
-// vector<vector<char>> to_grid(const string& s, int cols)
-// {
-//     string copy = s;
-//     vector<char> row;
-//     vector<vector<char>> answer;
-//     for (int i = 0; i < copy.size(); i++)
-//     {
-//         for (int j = 1; j <= cols; j++)
-//         {
-//             row.push_back(copy[i]);
-//         }
-        
-//     }
-// }
-
-//sum each row
-vector<int> row_sums(const vector<vector<int>>& grid)
+//Converting decimal to hexal
+string dec_hex (string input)
 {
-    int sum = 0; //need to INITALIZE the sum!
-    vector<int> answer;
-    for (int r = 0; r < grid.size(); r++) //iterate through rows
+    if (input.empty())
     {
-        sum = 0; //need to RESET the sum!
-        for (int c = 0; c < grid[r].size(); c++) //iterate through columns
-        {
-            sum = sum + grid[r][c];
-        }
-        answer.push_back(sum);
+        return "0";
+    }
+
+    int value = char_int(input);
+    if (value == 0)
+    {
+        return "0";
+    }
+
+    string possibleRemainders = "0123456789ABCDEF";
+    string answer;
+    while (value > 0)
+    {
+       int remainder = value % 16;
+       answer = possibleRemainders [remainder] + answer;
+       value = value / 16;
     }
     return answer;
 }
-
-
-//number system conversions
